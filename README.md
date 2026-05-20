@@ -7,7 +7,7 @@ Self-updating XMLTV electronic program guide for beIN Sports MENA channels, scra
 Paste this into your IPTV player as the EPG / TV-guide source:
 
 ```
-https://<YOUR_USERNAME>.github.io/bein-epg/guide.xml
+https://al7omed.github.io/bein-epg/guide.xml
 ```
 
 The file regenerates every 12 hours via GitHub Actions. Players that cache the EPG will pick up new data on their next refresh.
