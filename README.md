@@ -57,7 +57,7 @@ Your IPTV playlist is an `.m3u` file where each channel line has metadata. The `
 Example M3U entry:
 
 ```
-#EXTM3U x-tvg-url="https://<YOUR_USERNAME>.github.io/bein-epg/guide.xml"
+#EXTM3U x-tvg-url="https://al7omed.github.io/bein-epg/guide.xml"
 #EXTINF:-1 tvg-id="beINSports1.qa@MENA" tvg-name="beIN SPORTS 1" group-title="beIN Sports",beIN SPORTS 1
 http://your-iptv-provider/stream/beinsports1
 ```
@@ -67,7 +67,7 @@ The `x-tvg-url` header on the first line tells the player where to pull the EPG;
 ## Manual refresh
 
 ```sh
-gh workflow run update-epg.yml -R <YOUR_USERNAME>/bein-epg
+gh workflow run update-epg.yml -R al7omed/bein-epg
 ```
 
 Or click "Run workflow" in the Actions tab on github.com.
