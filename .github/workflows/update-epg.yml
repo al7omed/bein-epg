@@ -1,0 +1,74 @@
+name: Update EPG
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'channels/**'
+      - '.github/workflows/update-epg.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-epg
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+
+      - name: Checkout iptv-org/epg
+        uses: actions/checkout@v4
+        with:
+          repository: iptv-org/epg
+          ref: master
+          path: epg-tool
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: epg-tool/package-lock.json
+
+      - name: Install deps
+        working-directory: epg-tool
+        run: npm ci
+
+      - name: Override channels.xml with our copy
+        run: cp channels/beinsports.com_mena-en.channels.xml epg-tool/sites/beinsports.com/beinsports.com_mena-en.channels.xml
+
+      - name: Generate guide
+        working-directory: epg-tool
+        run: |
+          npm run grab --- \
+            --channels=sites/beinsports.com/beinsports.com_mena-en.channels.xml \
+            --output=../docs/guide.xml \
+            --days=2 \
+            --maxConnections=5
+
+      - name: Stats
+        run: |
+          echo "size: $(wc -c < docs/guide.xml) bytes"
+          echo "channels: $(grep -c '<channel ' docs/guide.xml || true)"
+          echo "programmes: $(grep -c '<programme ' docs/guide.xml || true)"
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/guide.xml
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update EPG $(date -u +%Y-%m-%dT%H:%MZ)"
+            git push
+          fi
