@@ -2,7 +2,8 @@ name: Update EPG
 
 on:
   schedule:
-    - cron: '0 */12 * * *'
+    # Hourly at :05 so iptv-epg-all (which builds at :15) consumes fresh data.
+    - cron: '5 * * * *'
   workflow_dispatch:
   push:
     branches: [main]
@@ -52,7 +53,7 @@ jobs:
           npm run grab --- \
             --channels=sites/beinsports.com/beinsports.com_mena-en.channels.xml \
             --output=../docs/guide.xml \
-            --days=2 \
+            --days=5 \
             --maxConnections=5
 
       - name: Stats
